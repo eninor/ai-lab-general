@@ -1,0 +1,3 @@
+4:2026-10-13 22:02:47 ERROR failed to connect db: dial tcp 10.0.0.7:5432 i/o timeout
+6:2026-10-13 22:03:05 ERROR db retry exhausted, fallback to local sqlite
+9:2026-10-13 22:07:41 ERROR token budget exceeded: 131072 > 128000
