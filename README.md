@@ -10,7 +10,7 @@
 | Task 01 | 现代 AI 编程环境与 CLI 协同工具配置 | `docs/Environment-Setup.md`、`.vscode/`、`assets/screenshots/` | ✅ 环境就绪，待补截图 |
 | Task 02 | Markdown 规范排版与实战笔记系统 | `docs/AI-Lab通识学习计划与环境踩坑记录.md`、`notes/` | ✅ 骨架完成，待持续记录 |
 | Task 03 | Linux 终端基础与常用命令行实战 | `docs/Linux-CLI-实战记录.md`、`projects/cli-lab-demo/` | ✅ 实操完成（Git Bash），WSL2 待手动装 |
-| Task 04 | Git 版本管理规范与 GitHub 协作 | `docs/Git-协作记录.md`、本仓库提交历史 | ⏳ SSH Key 已生成，待填身份并提交 |
+| Task 04 | Git 版本管理规范与 GitHub 协作 | `docs/Git-协作记录.md`、本仓库提交历史 | ✅ 10 次提交 + 1 次分支合并，待绑定远程 |
 | Task 05 | Conda 虚拟环境隔离与镜像源加速 | `docs/Environment-Setup.md#三task-05`、`configs/` | ✅ 完成（conda 26.7.1 + ailab 环境） |
 | Task 06 | Docker 容器化技术初探 | `projects/docker-demo/`、`docs/WSL2与Docker-手动安装指引.md` | ⏳ Dockerfile 已就绪，待手动装 Docker |
 | Task 07 | Python 核心语法与常用数据结构 | `src/basics/` | 待补练习 |

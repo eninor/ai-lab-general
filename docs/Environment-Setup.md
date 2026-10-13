@@ -246,8 +246,10 @@ git config --global init.defaultBranch main
 
 ## 七、待办清单
 
-- [ ] 填写 `git config --global user.name / user.email`（需你的 GitHub 用户名与邮箱）
-- [ ] 把公钥粘贴到 GitHub，执行 `ssh -T git@github.com` 验证连通
+- [x] 填写 `git config --global user.name / user.email` → 已配置为 `eninora` / `17200678363@163.com`
+- [x] 建立仓库提交历史 → 已 10 次语义化提交 + 1 次 feature 分支合并（共 12 个提交）
+- [ ] 在 GitHub 新建仓库并把公钥粘贴到 Settings → SSH and GPG keys，执行 `ssh -T git@github.com` 验证
+- [ ] 绑定远程：`git remote add origin git@github.com:eninora/ai-lab-general.git && git push -u origin main`
 - [ ] 手动安装 WSL2（`docs/WSL2与Docker-手动安装指引.md` 第一节）
 - [ ] 手动安装 Docker Desktop 并跑通 `projects/docker-demo`（同文档第二节）
 - [ ] `opencode auth login` 配置一个可用 API Key
