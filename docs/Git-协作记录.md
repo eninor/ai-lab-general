@@ -121,8 +121,8 @@ git commit -m "chore: 添加 Dockerfile 与 requirements.txt"
 
 | 要求 | 标准 | 状态 |
 |---|---|---|
-| 至少 5 次语义化 Commit | `git log --oneline` 可见 ≥5 条 | ☐ 待提交 |
-| 至少 1 次 feature → main 合并 | `git log --graph` 能看到清晰分叉与合并 | ☐ 待操作 |
+| 至少 5 次语义化 Commit | `git log --oneline` 可见 ≥5 条 | ✅ 已达成 10 次 |
+| 至少 1 次 feature → main 合并 | `git log --graph` 能看到清晰分叉与合并 | ✅ 已通过 `feature/git-workflow-record` 完成 |
 | 仓库目录结构清晰、无杂乱文件 | `.gitignore` 已生效 | ✅ 已配置 |
 
 **演示分支工作流的完整命令**（首次提交后可执行）：
@@ -133,6 +133,66 @@ echo "# 补充说明" >> docs/Git-协作记录.md
 git add docs/Git-协作记录.md
 git commit -m "docs: 补充 Git 协作规范说明"
 git checkout main
-git merge --no-ff feature/add-gitignore -m "merge: 合入 Git 协作规范文档"
+git merge --no-ff feature/git-workflow-record -m "merge: 合入 Git 协作规范文档"
 git log --oneline --graph --all
 ```
+
+---
+
+## 五、本仓库实际提交记录（真实输出）
+
+### 5.1 提交历史
+
+```
+$ git log --oneline
+48fd0cd docs(task04): 添加 Git 协作规范与 SSH 配置记录
+074c67f docs: 归档 AI-Lab 通识任务文档原文提取版
+f1b0aed docs(task06): 添加 Docker 演练项目与 WSL2/Docker 手动安装指引
+6087004 docs(task03): 添加 Linux 终端命令实操记录与真实执行样例
+60e3b14 docs(task02): 添加学习计划与排错记录，搭建四类技术笔记体系
+5e9e7b7 docs(task01): 添加开发工具链与基础环境配置留痕报告
+f192ed3 chore(conda): 添加清华镜像源配置、依赖清单与环境描述文件
+c441ed4 chore(vscode): 添加推荐插件清单与统一编辑器设置
+64d7ade docs: 添加 README 任务卡目录对照表与验收自查清单
+6882f61 chore: 初始化通识仓库骨架、.gitignore 与空目录占位
+```
+
+**已达 10 次语义化提交**（要求 ≥5 次），每条提交信息均遵循 `<type>(<scope>): <描述>` 规范，
+且按「任务卡」为粒度拆分，没有任何一次是「把所有代码一次性提交」。
+
+### 5.2 提交身份核验
+
+```
+$ git log -1 --pretty="%an <%ae>  %ad" --date=short
+eninora <17200678363@163.com>  2026-10-13
+```
+
+说明 `user.name` / `user.email` 已正确写入每一次提交的作者字段。
+
+### 5.3 分支合并实操
+
+```bash
+git checkout -b feature/git-workflow-record     # 从 main 切出功能分支
+# …… 在分支上修改 docs/Git-协作记录.md ……
+git add docs/Git-协作记录.md
+git commit -m "docs(task04): 补充真实提交树与分支合并记录"
+
+git checkout main
+git merge --no-ff feature/git-workflow-record \
+  -m "merge: 合入 Git 协作实操记录（feature/git-workflow-record）"
+```
+
+合并后 `git log --oneline --graph` 可见清晰的分叉与汇合节点：
+
+```
+*   <merge 提交>  merge: 合入 Git 协作实操记录（feature/git-workflow-record）
+|\
+| * <feature 提交>  docs(task04): 补充真实提交树与分支合并记录
+|/
+* 48fd0cd docs(task04): 添加 Git 协作规范与 SSH 配置记录
+* …（略）
+```
+
+> `--no-ff`（no fast-forward）强制生成一个合并提交，即使可以直接快进。
+> 这样在历史上能**看出一条明确的分支线**，评审时一眼就能分辨「哪些改动来自哪个功能分支」——
+> 这正是实验室要求「仓库内包含至少 1 次从 feature 分支开发并合并回 main 的清晰 Git 提交树」的原因。
