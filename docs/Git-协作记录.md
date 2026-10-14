@@ -66,8 +66,45 @@ ssh -T git@github.com
 # 输入 yes 后，看到 "Hi <用户名>! You've successfully authenticated" 即成功
 ```
 
-> 如果 `ssh -T` 卡住或超时，检查 `~/.ssh/config` 是否被代理干扰，可临时加：
+> **如果 `ssh -T` 卡住或超时**，检查 `~/.ssh/config` 是否被代理干扰，可临时加：
 > `ssh -T -o StrictHostKeyChecking=accept-new git@github.com`
+
+#### ⚠️ 本机实测：必须走 443 端口
+
+诊断结果：
+
+```
+github.com:22                       → Connection refused（端口被屏蔽）
+ssh.github.com:443                  → 可通
+https://github.com                  → HTTP 000（TLS 被重置，网页需加速工具）
+```
+
+所以 `C:\Users\20255\.ssh\config` 已配置为让 `git@github.com` 自动改走 `ssh.github.com:443`
+（副本见 `configs/ssh-config`）：
+
+```
+Host github.com
+    HostName ssh.github.com
+    Port 443
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+    ServerAliveInterval 30
+    ServerAliveCountMax 3
+```
+
+不配这一步的症状是 `git push` 无限卡住，或报
+`ssh: connect to host github.com port 22: Connection refused`。
+
+配置后验证：
+
+```
+$ ssh -T git@github.com
+Hi eninora! You've successfully authenticated, but GitHub does not provide shell access.
+```
+
+看到 `Hi eninora!` 即说明**网络链路 + 公钥认证全部打通**，可以正常 push。
+
+> 完整的分步操作指引见 `docs/Task04-GitHub协作-上手指引.md`。
 
 ---
 

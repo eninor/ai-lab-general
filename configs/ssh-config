@@ -1,0 +1,15 @@
+# GitHub SSH 走 443 端口 —— 国内网络环境下 22 端口常被屏蔽
+# 参考：https://docs.github.com/en/authentication/troubleshooting-ssh/using-ssh-over-the-https-port
+Host github.com
+    HostName ssh.github.com
+    Port 443
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+    ServerAliveInterval 30
+    ServerAliveCountMax 3
+
+Host gist.github.com
+    HostName gist.github.com
+    Port 443
+    User git
+    IdentityFile ~/.ssh/id_ed25519
