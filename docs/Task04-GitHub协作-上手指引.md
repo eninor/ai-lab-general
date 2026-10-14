@@ -8,7 +8,7 @@
 
 | 任务卡步骤 | 内容 | 状态 |
 |---|---|---|
-| a. 配置 `user.name` / `user.email` | `eninora` / `17200678363@163.com` | ✅ 已完成 |
+| a. 配置 `user.name` / `user.email` | `eninor` / `17200678363@163.com` | ✅ 已完成 |
 | a. 生成 SSH Key | `C:\Users\20255\.ssh\id_ed25519`（ed25519） | ✅ 已完成 |
 | a. **把公钥贴到 GitHub** | — | ⏳ **待做（见第三节）** |
 | b. 本地版本库管理 | 已跑通 `init/status/add/commit/log` | ✅ 已完成 |
@@ -100,7 +100,7 @@ ssh.github.com:443                  → 可通 ✅
 ```
 $ git config --global --list
 user.email=17200678363@163.com
-user.name=eninora
+user.name=eninor
 core.autocrlf=true
 init.defaultbranch=main
 ```
@@ -153,7 +153,7 @@ Are you sure you want to continue connecting (yes/no/[fingerprint])?
 输入 `yes` 回车。看到下面这句就成功了：
 
 ```
-Hi eninora! You've successfully authenticated, but GitHub does not provide shell access.
+Hi eninor! You've successfully authenticated, but GitHub does not provide shell access.
 ```
 
 > 看到 `Hi 你的用户名!` = 成功；看到 `Permission denied (publickey)` = 公钥还没加上去或贴错了，回 a3 重做。
@@ -219,7 +219,7 @@ git merge --no-ff feature/xxx -m "merge: 合入 xxx"   # 合并回主干
 
 ```bash
 cd C:/Users/20255/WorkBuddy/2026-10-13-22-52-42/ai-lab-general
-git remote add origin git@github.com:eninora/ai-lab-general.git
+git remote add origin git@github.com:eninor/ai-lab-general.git
 git remote -v          # 验证：应显示 fetch/push 两行
 ```
 
@@ -237,7 +237,7 @@ git push -u origin main
 ```
 Enumerating objects: 60, done.
 ...
-To github.com:eninora/ai-lab-general.git
+To github.com:eninor/ai-lab-general.git
  * [new branch]      main -> main
 branch 'main' set up to track 'origin/main'.
 ```
@@ -251,7 +251,7 @@ branch 'main' set up to track 'origin/main'.
 
 ```bash
 cd /tmp
-git clone git@github.com:eninora/ai-lab-general.git ai-lab-general-check
+git clone git@github.com:eninor/ai-lab-general.git ai-lab-general-check
 ls ai-lab-general-check
 ```
 

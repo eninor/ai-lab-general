@@ -19,7 +19,7 @@ git version 2.55.0.windows.3
 > —— 这是全新环境未初始化 `.gitconfig` 的正常现象，执行下面几条命令即可。
 
 ```bash
-git config --global user.name  "eninora"
+git config --global user.name  "eninor"
 git config --global user.email "17200678363@163.com"
 
 # 推荐：统一换行符策略，避免 Windows/Linux 协作时的 CRLF 噪音
@@ -33,7 +33,7 @@ git config --global init.defaultBranch main
 ```
 $ git config --global --list
 user.email=17200678363@163.com
-user.name=eninora
+user.name=eninor
 core.autocrlf=true
 init.defaultbranch=main
 ```
@@ -99,10 +99,10 @@ Host github.com
 
 ```
 $ ssh -T git@github.com
-Hi eninora! You've successfully authenticated, but GitHub does not provide shell access.
+Hi eninor! You've successfully authenticated, but GitHub does not provide shell access.
 ```
 
-看到 `Hi eninora!` 即说明**网络链路 + 公钥认证全部打通**，可以正常 push。
+看到 `Hi eninor!` 即说明**网络链路 + 公钥认证全部打通**，可以正常 push。
 
 > 完整的分步操作指引见 `docs/Task04-GitHub协作-上手指引.md`。
 
@@ -201,7 +201,7 @@ c441ed4 chore(vscode): 添加推荐插件清单与统一编辑器设置
 
 ```
 $ git log -1 --pretty="%an <%ae>  %ad" --date=short
-eninora <17200678363@163.com>  2026-10-13
+eninor <17200678363@163.com>  2026-10-13
 ```
 
 说明 `user.name` / `user.email` 已正确写入每一次提交的作者字段。
