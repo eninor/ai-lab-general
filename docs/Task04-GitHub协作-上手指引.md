@@ -158,6 +158,29 @@ Hi eninor! You've successfully authenticated, but GitHub does not provide shell 
 
 > 看到 `Hi 你的用户名!` = 成功；看到 `Permission denied (publickey)` = 公钥还没加上去或贴错了，回 a3 重做。
 
+**💡 顺手记住一个小技巧**：`Hi` 后面回显的那串字符，就是 GitHub 认定的**你的用户名**。
+
+本次配置时就踩到了这个点——本地按 `eninora` 配置，而 `ssh -T` 回显的是 `Hi eninor!`，
+说明真实用户名少了最后一个字母。二者差一个字母，会导致：
+
+| 受影响的东西 | 后果 |
+|---|---|
+| `git remote add origin git@github.com:**eninora**/...` | 推送报 `Repository not found` |
+| `git config --global user.name` | 提交记录里显示的名字与账号对不上（不影响归属，GitHub 靠邮箱匹配） |
+
+**所以：不确定用户名时，`ssh -T` 是最权威的确认方式**，比回忆注册时填了什么靠谱。
+改名的成本和命令：
+
+```bash
+git config --global user.name "正确的用户名"
+
+# 已提交的历史如需一并改名（尚未推送时可用，已推送则需强推，慎用）
+git filter-branch -f --env-filter '
+if [ "$GIT_AUTHOR_NAME" = "旧名字" ]; then export GIT_AUTHOR_NAME="新名字"; fi
+if [ "$GIT_COMMITTER_NAME" = "旧名字" ]; then export GIT_COMMITTER_NAME="新名字"; fi
+' --tag-name-filter cat -- --all
+```
+
 ---
 
 ## 四、步骤 b：本地版本库管理（已完成）
