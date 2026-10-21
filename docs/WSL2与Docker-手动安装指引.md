@@ -1,157 +1,126 @@
-# WSL2 与 Docker 手动安装指引（Task 03 / Task 06 补充）
+# WSL2 与 Docker 安装记录（Task 03 / Task 06）
 
-> **为什么这两项需要你手动做？**
-> 1. 二者都需要**管理员权限**并**重启系统**，自动化流程无法代劳；
-> 2. 本机 `wsl.exe` 被安全策略列入程序黑名单，直接调用会报
->    `PROGRAM BLOCKED BY SECURITY POLICY`，需先放行。
->
-> 下面每一步都可直接复制执行，按顺序做完即可闭环 Task 03 与 Task 06。
+> **状态：两项均已完成（2026-10-20 深夜）。**
+> WSL2 + Ubuntu 22.04.5 完成导入；Docker 29.1.3 安装完成并验证通过。
+> Docker 完整实操记录见 [`Task06-Docker实战记录.md`](./Task06-Docker实战记录.md)。
+> 本文保留为**安装过程与排错依据**，便于后续重装或迁移时复现。
 
 ---
 
-## 零、先放行 wsl.exe（否则后续命令全部被拦）
+## 零、关于 `wsl.exe` 被拦（更正）
 
-图形界面路径：**Windows 安全中心 → 命令安全 → 程序黑名单 → 移除 `C:\Windows\System32\wsl.exe`**
+早期版本本文写过「需到 Windows 安全中心 → 命令安全 → 程序黑名单移除 `wsl.exe`」。**该结论有误，已作废。**
 
-或管理员 PowerShell 检查（仅查看，不改）：
-
-```powershell
-Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AppHVSI" -ErrorAction SilentlyContinue
-```
-
-放行后**重开一个终端**再继续。
+实测确认：注册表 `HKLM:\SOFTWARE\Policies\Microsoft\Windows\AppHVSI` 不存在，本机并无相关系统策略。
+`PROGRAM BLOCKED BY SECURITY POLICY` 只出现在 AI 助手自身的执行沙箱中，**用户在普通 PowerShell 里运行 `wsl` 完全正常，不需要放行任何东西。**
 
 ---
 
-## 一、安装 WSL2（Task 03）
+## 一、WSL2 + Ubuntu 安装（已完成）
 
-### 步骤 1：一条命令装齐（推荐，Windows 11 支持）
+### 1.1 前置：启用 Windows 功能
 
-以**管理员身份**打开 PowerShell（开始菜单搜索 `PowerShell` → 右键 → 以管理员身份运行）：
-
-```powershell
-wsl --install -d Ubuntu-22.04
-```
-
-该命令会自动完成：启用「适用于 Linux 的 Windows 子系统」+「虚拟机平台」两个功能 → 下载安装内核 → 安装 Ubuntu 22.04。
-
-### 步骤 2：重启电脑
+需要**管理员** PowerShell，两条 DISM 均返回 `3010`（成功 + 需重启）：
 
 ```powershell
-Restart-Computer
-```
-
-### 步骤 3：首次启动 Ubuntu，设置用户名与密码
-
-重启后开始菜单会出现 **Ubuntu**，首次启动会让你设置 Linux 用户名（小写字母）和密码（**输入时不显示字符是正常的**）。
-
-### 步骤 4：确认版本为 2
-
-```powershell
-wsl -l -v
-# 应显示：  NAME            STATE           VERSION
-#          Ubuntu-22.04    Running         2
-```
-
-若不是 2：
-
-```powershell
-wsl --set-version Ubuntu-22.04 2
-wsl --set-default-version 2
-```
-
-### 分步安装（若 `wsl --install` 不可用）
-
-```powershell
+$env:PATH = "$env:SystemRoot\System32;$env:PATH"   # 本机 PATH 中 System32 损坏，需先修补
 dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
 dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
-# 重启后：
-wsl --set-default-version 2
-wsl --install -d Ubuntu-22.04
 ```
 
-### 验证（在 Ubuntu 终端内执行）
+> 必须检查返回码：`0` 或 `3010` 才算成功。早期脚本漏检返回码，DISM 全部失败仍打印「开好了」，属于假成功。
+> 重启后 `LxssManager` 服务才会注册。
 
-```bash
-uname -a                 # 应看到 microsoft-standard-WSL2
-lsb_release -a           # 应显示 Ubuntu 22.04
-cat /etc/os-release
-df -h                    # 观察 Linux 的文件系统视图，与 Windows 完全不同
+### 1.2 离线导入发行版（实际采用路径）
+
+比 `wsl --install -d Ubuntu-22.04` 更快：镜像已预先下载并校验 SHA256，无需联网。
+
+```powershell
+# 关键：父目录必须先存在，否则报 ERROR_PATH_NOT_FOUND
+New-Item -ItemType Directory "D:\wsl" -Force
+
+wsl --import Ubuntu "D:\wsl\Ubuntu" "C:\Users\20255\WorkBuddy\2026-10-20-16-02-37\task03-linux\wsl\ubuntu-jammy-rootfs.tar.gz" --version 2
+
+wsl -d Ubuntu -u root bash -c "useradd -m -s /bin/bash student && echo 'student:123456' | chpasswd"
+wsl --set-default Ubuntu
 ```
 
-> **交付留痕**：把 `uname -a` 与 `lsb_release -a` 的输出截图，存为
-> `assets/screenshots/task03_wsl2.png`。
+验证：
+
+```powershell
+wsl -d Ubuntu bash -c "uname -a; cat /etc/os-release | head -2"
+```
+
+```
+Linux localhost 6.18.54.1-microsoft-standard-WSL2 ... x86_64 GNU/Linux
+PRETTY_NAME="Ubuntu 22.04.5 LTS"
+```
+
+![WSL2 环境验证](../assets/screenshots/task03_wsl2.png)
+
+> 二次执行 `wsl --import` 会报 `ERROR_ALREADY_EXISTS`，说明分发已注册，属正常，忽略即可。
+
+### 1.3 `.wslconfig` 资源限制
+
+`%USERPROFILE%\.wslconfig`（本机 32GB 内存）：
+
+```ini
+[wsl2]
+memory=8GB
+processors=8
+swap=2GB
+localhostForwarding=true
+```
 
 ---
 
-## 二、安装 Docker（Task 06）
+## 二、Docker 安装（已完成）
 
-### 前置条件
+### 2.1 路线决策
 
-Task 06 的推荐路径是 **Docker Desktop + WSL2 后端**，所以请先完成上面第一步。
+| 方案 | 实测下载速度 | 结论 |
+|---|---|---|
+| Docker Desktop（`desktop.docker.com`） | 118 KB/s（620MB ≈ 90 分钟） | 放弃 |
+| Linux 原生（清华源 `apt install docker.io`） | 6.8 MB/s | **采用** |
 
-### 步骤 1：安装 Docker Desktop
+任务书原文允许两条路线：「安装 Docker（**Linux 原生** 或 Windows WSL2 Docker Desktop）」。
 
-方式 A —— winget（Windows 11 自带，最省事）：
+### 2.2 实际安装步骤
 
-```powershell
-winget install --id Docker.DockerDesktop -e --accept-source-agreements --accept-package-agreements
-```
+```bash
+# 1. 换清华 apt 源（备份原文件）
+cp /etc/apt/sources.list /etc/apt/sources.list.bak
+# 写入 tuna jammy 源后：
+apt-get update
 
-方式 B —— 官网下载安装包：
+# 2. 安装
+apt-get install -y docker.io
 
-```text
-https://www.docker.com/products/docker-desktop/
-```
-
-下载 `Docker Desktop Installer.exe` 后双击，安装选项中**务必勾选**：
-- ☑ Use WSL 2 instead of Hyper-V (recommended)
-- ☑ Add shortcut to desktop
-
-### 步骤 2：首次启动与配置镜像加速
-
-安装完成后启动 Docker Desktop，接受服务条款。任务栏出现鲸鱼图标且为**绿色 Engine running** 即就绪。
-
-国内网络下建议配置镜像加速：**Settings → Docker Engine**，在 JSON 中加入：
-
-```json
+# 3. 配置镜像加速（不配则 pull 必然超时）
+mkdir -p /etc/docker && cat > /etc/docker/daemon.json <<'EOF'
 {
   "registry-mirrors": [
     "https://docker.m.daocloud.io",
-    "https://dockerproxy.com",
-    "https://mirror.baidubce.com"
+    "https://docker.1ms.run",
+    "https://docker.xuanyuan.me"
   ]
 }
+EOF
+
+# 4. 启动（本机 systemd 可用）
+systemctl enable --now docker
+
+# 5. 普通用户免 sudo
+usermod -aG docker student
 ```
 
-点击 **Apply & Restart**。
+本机实测结果：`Docker version 29.1.3`、存储驱动 `overlayfs`、`hello-world` 输出 `Hello from Docker!`。
 
-> 提示：镜像源可用性会随时间变化，若 `docker pull` 报 `context deadline exceeded`，
-> 换一个 mirror 或直接使用能访问的官方源。
+### 2.3 可复用的一键脚本
 
-### 步骤 3：验证安装
-
-在**普通** PowerShell 或 Git Bash 中执行：
-
-```bash
-docker --version
-docker run hello-world
-```
-
-`hello-world` 输出 `Hello from Docker!` 即表示镜像拉取 + 容器运行链路全通。
-
-### 步骤 4：完成 Task 06 实操
-
-```bash
-cd projects/docker-demo
-docker build -t ailab-demo:1.0 .
-docker images
-docker run --rm ailab-demo:1.0
-docker run -it --rm -v "${PWD}":/app -w /app python:3.10-slim python -c "print('Hello AI-Lab Docker')"
-```
-
-> **交付留痕**：把 `docker build` 的完整输出 + `docker run` 的运行结果截图，存为
-> `assets/screenshots/task06_docker.png`。
+`setup-docker.sh` 已固化为 7 步幂等脚本（换源 → 安装 → 配加速 → 启动 → 建组 → 验证 → 预拉镜像），
+含环境自检、失败回退与日志落盘，可通过 `wsl -d Ubuntu -u root bash /home/student/setup-docker.sh` 重跑。
+本机副本在 `/home/student/setup-docker.sh`，日志 `/home/student/docker-setup.log`。
 
 ---
 
@@ -159,19 +128,23 @@ docker run -it --rm -v "${PWD}":/app -w /app python:3.10-slim python -c "print('
 
 | 现象 | 原因 | 解决 |
 |---|---|---|
-| `wsl --install` 报 `PROGRAM BLOCKED BY SECURITY POLICY` | 安全策略黑名单 | 见本文「零」章节先放行 |
-| `WslRegisterDistribution failed with error: 0x80370102` | BIOS 未开启虚拟化 | 进 BIOS 开启 Intel VT-x / AMD-V，或在「启用或关闭 Windows 功能」勾选「虚拟机平台」 |
-| Docker Desktop 启动后一直转圈 | WSL2 未就绪或内核过旧 | 执行 `wsl --update` 后重启 Docker Desktop |
-| `docker build` 报 `Cannot connect to the Docker daemon` | Docker Desktop 未启动 | 启动桌面端，等鲸鱼图标变绿 |
-| `docker pull` 卡住 / 超时 | 国内直连 Docker Hub 受限 | 配置 `registry-mirrors`（见上） |
-| `-v $(pwd):/app` 在 PowerShell 下为空 | PowerShell 不解析 `$(pwd)` | 用 `${PWD}`；CMD 用 `%cd%` |
-| Docker Desktop 占用 C 盘空间大 | 镜像与容器默认存放在 C 盘 | Settings → Resources → Disk image location 改到 D 盘 |
+| `wsl --import` 报 `ERROR_PATH_NOT_FOUND` | 安装位置的**父目录**不存在 | 先 `New-Item D:\wsl` |
+| `wsl --import` 报 `ERROR_ALREADY_EXISTS` | 分发已注册 | 无需处理，直接 `wsl -l -v` 验证 |
+| PowerShell 里 `docker` 报「无法识别」 | docker 在 Linux 内，Windows 无转发器 | 先 `wsl -d Ubuntu`；看提示符 `PS C:\>` / `student@localhost:~$` |
+| `Cannot connect to the Docker daemon` | 守护进程未启动 | `systemctl start docker`（无 systemd 时 `service docker start`） |
+| `docker pull` 卡住 / `context deadline exceeded` | Docker Hub 直连不可达（实测 `http=000`） | 配 `registry-mirrors` 后重启 docker |
+| `-v $(pwd):/app` 在 PowerShell 下路径为空 | PowerShell 不解析 `$(pwd)` | 用 `${PWD}`；CMD 用 `%cd%` |
+| 多行命令粘贴后拼成一条 | 终端粘贴丢失换行 | 一次粘一行，或用 `;` 串联 |
+| Docker 占用 C 盘巨大 | 默认数据目录在系统盘 | WSL 原生方案数据在 `D:\wsl\Ubuntu\ext4.vhdx`，不占 C 盘 |
 
 ---
 
-## 四、这两项做完后，Task 03 / Task 06 的交付物清单
+## 四、交付物对应
 
 | 任务 | 交付物 | 存放位置 |
 |---|---|---|
-| Task 03 | WSL2 环境验证截图、Linux 命令实操记录 | `docs/Linux-CLI-实战记录.md`、`assets/screenshots/task03_wsl2.png` |
-| Task 06 | Dockerfile 源码、构建与运行日志截图 | `projects/docker-demo/`、`assets/screenshots/task06_docker.png` |
+| Task 03 | WSL2 环境验证截图 | `assets/screenshots/task03_wsl2.png` |
+| Task 03 | Linux 命令实操记录 | `docs/Linux-CLI-实战记录.md` |
+| Task 06 | Dockerfile 源码 | `projects/docker-demo/Dockerfile` |
+| Task 06 | 构建与运行日志截图 | `assets/screenshots/task06_docker_build.png`、`task06_docker_run.png` |
+| Task 06 | 完整实战记录 | `docs/Task06-Docker实战记录.md` |

@@ -9,10 +9,10 @@
 |---|---|---|---|
 | Task 01 | 现代 AI 编程环境与 CLI 协同工具配置 | `docs/Environment-Setup.md`、`.vscode/`、`assets/screenshots/` | ✅ 环境就绪，待补截图 |
 | Task 02 | Markdown 规范排版与实战笔记系统 | `docs/AI-Lab通识学习计划与环境踩坑记录.md`、`notes/` | ✅ 骨架完成，待持续记录 |
-| Task 03 | Linux 终端基础与常用命令行实战 | `docs/Linux-CLI-实战记录.md`、`projects/cli-lab-demo/` | ✅ 实操完成（Git Bash），WSL2 待手动装 |
+| Task 03 | Linux 终端基础与常用命令行实战 | `docs/Linux-CLI-实战记录.md`、`projects/cli-lab-demo/`、`assets/screenshots/task03_wsl2.png` | ✅ 完成（Git Bash + WSL2 Ubuntu 22.04.5） |
 | Task 04 | Git 版本管理规范与 GitHub 协作 | `docs/Git-协作记录.md`、本仓库提交历史 | ✅ 10 次提交 + 1 次分支合并，待绑定远程 |
 | Task 05 | Conda 虚拟环境隔离与镜像源加速 | `docs/Environment-Setup.md#三task-05`、`configs/` | ✅ 完成（conda 26.7.1 + ailab 环境） |
-| Task 06 | Docker 容器化技术初探 | `projects/docker-demo/`、`docs/WSL2与Docker-手动安装指引.md` | ⏳ Dockerfile 已就绪，待手动装 Docker |
+| Task 06 | Docker 容器化技术初探 | `projects/docker-demo/`、`docs/Task06-Docker实战记录.md`、`assets/screenshots/task06_*.png` | ✅ 完成（Docker 29.1.3，build + run 全链路通过） |
 | Task 07 | Python 核心语法与常用数据结构 | `src/basics/` | 待补练习 |
 | Task 08 | Python 文件 I/O、异常处理与工程基础 | `src/io/` | 待补脚本 |
 | Task 09 | 经典算法与编程逻辑专项巩固（洛谷 ≥6 题） | `src/luogu/` | 待补题解 |
@@ -25,11 +25,17 @@ ai-lab-general/
 ├── README.md                 # 本文件：任务卡与目录索引
 ├── .gitignore
 ├── assets/screenshots/       # 全部环境截图与运行留痕
+│   ├── task03_wsl2.png               # WSL2 Ubuntu 22.04 环境验证
+│   ├── task06_docker_install.png     # Docker 安装完成 + hello-world 验证
+│   ├── task06_docker_env.png         # docker --version + 镜像列表
+│   ├── task06_docker_build.png       # docker build 完整日志
+│   └── task06_docker_run.png         # docker run / 挂载 / 生命周期四态
 ├── configs/                  # 可复现的配置文件（.condarc、settings.json 等）
 ├── docs/                     # 各类交付文档
 │   ├── AI-Lab通识学习计划与环境踩坑记录.md   # Task 02 主交付物
 │   ├── Environment-Setup.md                  # Task 01 / 05 / 06 环境配置留痕
 │   ├── Linux-CLI-实战记录.md                  # Task 03
+│   ├── Task06-Docker实战记录.md               # Task 06：路线选择、Dockerfile 解析、build/run 实录
 │   └── Git-协作记录.md                        # Task 04
 ├── notes/                    # 个人技术笔记体系（Task 02）
 │   ├── 01-环境配置/

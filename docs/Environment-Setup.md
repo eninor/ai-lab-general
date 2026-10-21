@@ -14,10 +14,10 @@
 | Task 01 | 终端 AI Agent | ✅ 双份就绪 | DSH v0.2.0-rc.2 + OpenCode v1.19.0 |
 | Task 01 | 大模型 API | ✅ 已配置 | DSH 凭据文件 `~/.dsh/.credentials.yaml` 中已存在 `DEEPSEEK_API_KEY` |
 | Task 02 | Markdown 笔记工具 | ✅ 就绪 | VSCode + Markdown All in One + Markdown Preview Enhanced；笔记目录体系已建 |
-| Task 03 | Linux 终端 | ⏳ 待手动 | 当前用 Git Bash 完成等价实操；WSL2 需手动装（见专项指引） |
+| Task 03 | Linux 终端 | ✅ 完成 | Git Bash 等价实操 + WSL2 Ubuntu 22.04.5 已装（内核 6.18.54.1） |
 | Task 04 | Git / SSH | ⚠️ 部分完成 | SSH Key 已生成；`user.name` / `user.email` 待填真实值 |
 | Task 05 | Miniconda + 镜像源 | ✅ 完成 | conda 26.7.1，清华源，`ailab` 环境 Python 3.10.22，依赖已导出 |
-| Task 06 | Docker | ⏳ 待手动 | 需管理员权限 + WSL2 + 重启，已产出完整手动步骤与 Dockerfile |
+| Task 06 | Docker | ✅ 完成 | Docker 29.1.3（WSL2 Ubuntu 原生），`build` + `run` 全链路通过，见 `Task06-Docker实战记录.md` |
 
 ---
 
@@ -188,22 +188,20 @@ conda remove -n ailab --all   # 删环境（危险操作，确认后再执行）
 
 ---
 
-## 四、Task 03 / Task 06：需手动完成的事项
+## 四、Task 03 / Task 06：已完成（原「待手动」事项已闭环）
 
-两项的共同障碍：**需要管理员权限 + 重启系统**，且本机 `wsl.exe` 当前被安全策略拦截。
+**状态：两项均已于 2026-10-20 完成。**
 
-```bash
-$ wsl --status
-PROGRAM BLOCKED BY SECURITY POLICY - The sandbox prevented a program
-on the configured Program Blacklist from starting:
-  - wsl.exe (C:\Windows\system32\wsl.exe)
-```
+早期本节记录的障碍（需要管理员权限 + 重启；`wsl.exe` 被拦报 `PROGRAM BLOCKED BY SECURITY POLICY`）已澄清与解决：
 
-→ 完整的**可复制执行步骤**（含放行方法、`wsl --install`、Docker Desktop 安装、镜像加速、验证命令、常见坑速查）见：
+1. `wsl.exe` 的拦截**只是 AI 助手执行沙箱的限制**，普通 PowerShell 不受影响——注册表 `HKLM:\SOFTWARE\Policies\Microsoft\Windows\AppHVSI` 并不存在，无需放行任何东西；
+2. 两个 Windows 功能的 DISM 均返回 `3010`，重启后 LxssManager 正常注册；
+3. Docker 最终未走 Docker Desktop（官方 CDN 实测 118 KB/s，620MB 约需 90 分钟），改走任务书允许的「Linux 原生」路线，用清华源 `apt install docker.io`，实测 6.8 MB/s。
 
-**`docs/WSL2与Docker-手动安装指引.md`**
+→ 安装过程、路线决策依据与排错表见 **`docs/WSL2与Docker-手动安装指引.md`**；
+→ Docker 实操（Dockerfile 解析、build / run / 生命周期、原理讲解）见 **`docs/Task06-Docker实战记录.md`**。
 
-Task 06 所需的 `Dockerfile`、`app.py`、`requirements.txt`、`README.md` 已写入 `projects/docker-demo/`，装好 Docker 后按 README 三步即可跑通。
+`projects/docker-demo/` 下的 `Dockerfile`、`app.py`、`requirements.txt`、`README.md` 已全部验证可跑通，镜像 `ailab-demo:1.0`。
 
 ---
 
@@ -250,8 +248,9 @@ git config --global init.defaultBranch main
 - [x] 建立仓库提交历史 → 已 10 次语义化提交 + 1 次 feature 分支合并（共 12 个提交）
 - [ ] 在 GitHub 新建仓库并把公钥粘贴到 Settings → SSH and GPG keys，执行 `ssh -T git@github.com` 验证
 - [ ] 绑定远程：`git remote add origin git@github.com:eninor/ai-lab-general.git && git push -u origin main`
-- [ ] 手动安装 WSL2（`docs/WSL2与Docker-手动安装指引.md` 第一节）
-- [ ] 手动安装 Docker Desktop 并跑通 `projects/docker-demo`（同文档第二节）
+- [x] 安装 WSL2 + Ubuntu 22.04.5（离线 `wsl --import`，内核 6.18.54.1）
+- [x] 安装 Docker 并跑通 `projects/docker-demo`（Linux 原生 29.1.3，镜像 `ailab-demo:1.0` 已构建成功）
 - [ ] `opencode auth login` 配置一个可用 API Key
-- [ ] 补齐各任务截图至 `assets/screenshots/`
+- [x] 补齐 Task 03 / Task 06 截图至 `assets/screenshots/`
+- [ ] 补齐 Task 01 / 04 / 05 截图
 - [ ] 完成 Task 07 / 08 / 09 练习代码与 Task 10 收官项目
